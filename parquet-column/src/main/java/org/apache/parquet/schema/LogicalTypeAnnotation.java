@@ -1268,12 +1268,12 @@ public abstract class LogicalTypeAnnotation {
    * {@code offset} must also declare {@code size}, and a group must declare at least one of
    * {@code inline}, {@code uri}, or {@code offset} (a value resolves to bytes only via one of
    * these; a group declaring none of them — even if it declares {@code size} — can never produce a
-   * resolvable value). A group that declares {@code offset} but not {@code uri} permits only
-   * self-references (a value with {@code uri} unset that locates bytes within the current file) and
-   * must therefore also declare {@code inline}: the {@code inline} column chunk of the same row
-   * group is the reference point whose compression and encryption a self-reference inherits. A
-   * group that declares {@code uri} is treated as an external-reference schema and is not required
-   * to declare {@code inline}. Each declared field must also match its required physical type.
+   * resolvable value). A group that declares {@code offset} permits self-references (a value with
+   * {@code uri} unset that locates bytes within the current file) and must therefore also declare
+   * {@code inline}: the {@code inline} column chunk of the same row group is the reference point
+   * whose compression and encryption a self-reference inherits. Declaring {@code uri} does not
+   * exempt a group from this, because {@code uri} is optional per value and any row leaving it
+   * unset is a self-reference. Each declared field must also match its required physical type.
    * Per-value
    * rules that depend on the data in each row — {@code offset} being set for a self-reference
    * (unset {@code uri}), {@code size} being set whenever {@code offset} is set, and

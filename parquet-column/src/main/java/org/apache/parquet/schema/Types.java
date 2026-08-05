@@ -875,20 +875,20 @@ public class Types {
               + "resolves to bytes only via one of these, so a group declaring none of them can "
               + "never produce a valid value",
           name);
-      // A schema that permits self-references must declare `inline`. A self-reference (`uri` not
-      // set) always sets `offset`, and the `inline` column chunk of the same row group is the
-      // reference point whose compression and encryption a self-reference inherits. A group that
-      // declares `offset` but not `uri` can only produce self-references (an offset-based read with
-      // no `uri` is a self-reference), so it must also declare `inline`. A group that declares
-      // `uri` is not required to declare `inline`: `offset`/`size` there describe an external
-      // ranged reference, and although the per-value `uri` could be left unset in some rows, the
-      // schema is treated as an external-reference schema and the `inline` requirement is not
-      // imposed.
+      // A schema that permits self-references must declare `inline`, because the `inline` column
+      // chunk of the same row group is the reference point whose compression and encryption a
+      // self-reference inherits. Any group declaring `offset` permits self-references: a
+      // self-reference is an offset-based read with `uri` unset, and because `uri` is optional
+      // per-value, declaring `uri` does not prevent rows from leaving it unset. So the requirement
+      // applies whenever `offset` is declared, not only when `uri` is absent -- otherwise a
+      // `uri`+`offset`+`size` group could emit a self-reference with no reference point to inherit
+      // from, which no reader could resolve.
       Preconditions.checkArgument(
-          !(hasOffset && !hasUri) || hasInline,
-          "FILE type group '%s' declares field 'offset' but neither 'uri' nor 'inline'; a schema "
-              + "that permits self-references (offset without uri) must declare 'inline' as the "
-              + "reference point for storage inheritance",
+          !hasOffset || hasInline,
+          "FILE type group '%s' declares field 'offset' but not 'inline'; a schema that permits "
+              + "self-references must declare 'inline' as the reference point for storage "
+              + "inheritance. Note that declaring 'uri' does not exempt the group, because 'uri' is "
+              + "optional per value and any row leaving it unset is a self-reference",
           name);
       // The remaining spec rules are per-value constraints that the schema builder cannot verify
       // because it sees only which fields are declared, not their values in each row: a
