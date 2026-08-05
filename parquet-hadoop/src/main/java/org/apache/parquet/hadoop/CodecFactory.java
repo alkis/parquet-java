@@ -316,8 +316,7 @@ public class CodecFactory implements CompressionCodecFactory {
    * @return the decompressed (resolved) bytes
    * @throws IOException if decompression fails
    */
-  public BytesInput decompressUnknownSize(CompressionCodecName codecName, BytesInput compressed)
-      throws IOException {
+  public BytesInput decompressUnknownSize(CompressionCodecName codecName, BytesInput compressed) throws IOException {
     CompressionCodec codec = getCodec(codecName);
     if (codec == null) {
       // UNCOMPRESSED: the stored bytes are the resolved bytes.
@@ -332,7 +331,17 @@ public class CodecFactory implements CompressionCodecFactory {
 
     Decompressor decompressor = CodecPool.getDecompressor(codec);
     if (decompressor == null) {
-      throw new IOException("Could not obtain a decompressor for codec " + codecName);
+      // Some codecs (ZSTD) expose no Decompressor and decompress only through their stream, which
+      // is framed and so reports end-of-input properly. Drain it.
+      try (InputStream is = codec.createInputStream(compressed.toInputStream(), null);
+          ByteArrayOutputStream out = new ByteArrayOutputStream(compressedBytes.length * 2)) {
+        byte[] buffer = new byte[MIN_UNKNOWN_SIZE_BUFFER];
+        int read;
+        while ((read = is.read(buffer)) != -1) {
+          out.write(buffer, 0, read);
+        }
+        return BytesInput.from(out.toByteArray());
+      }
     }
     try {
       // Compression rarely achieves better than 2x on the payloads worth storing out of line, so

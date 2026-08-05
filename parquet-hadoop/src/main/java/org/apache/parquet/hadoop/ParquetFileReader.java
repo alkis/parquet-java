@@ -1100,8 +1100,7 @@ public class ParquetFileReader implements Closeable {
       throw new IllegalArgumentException("Self-reference size must not be negative: " + size);
     }
     if (size > SelfReferenceStorage.MAX_ENCRYPTED_MODULE_SIZE) {
-      throw new IllegalArgumentException(
-          "Self-reference size exceeds the maximum readable range: " + size);
+      throw new IllegalArgumentException("Self-reference size exceeds the maximum readable range: " + size);
     }
 
     byte[] stored = new byte[(int) size];

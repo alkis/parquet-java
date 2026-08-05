@@ -47,8 +47,7 @@ public class TestSelfReferenceAAD {
     int columnOrdinal = 7;
     long selfReferenceOffset = 0x0102030405060708L;
 
-    byte[] aad =
-        AesCipher.createSelfReferenceAAD(FILE_AAD, rowGroupOrdinal, columnOrdinal, selfReferenceOffset);
+    byte[] aad = AesCipher.createSelfReferenceAAD(FILE_AAD, rowGroupOrdinal, columnOrdinal, selfReferenceOffset);
 
     // Layout: fileAAD | moduleType(1) | rowGroupOrdinal(2 LE) | columnOrdinal(2 LE) |
     //         selfReferenceOffset(8 LE)

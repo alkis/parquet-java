@@ -78,8 +78,7 @@ public class TestSelfReferenceFileWrite {
 
   private static final ColumnDescriptor ID_COLUMN = SCHEMA.getColumnDescription(new String[] {"id"});
   // The inline column is the storage-inheritance reference point for the FILE group.
-  private static final ColumnDescriptor INLINE_COLUMN =
-      SCHEMA.getColumnDescription(new String[] {"file", "inline"});
+  private static final ColumnDescriptor INLINE_COLUMN = SCHEMA.getColumnDescription(new String[] {"file", "inline"});
 
   private static final CompressionCodecName CODEC = CompressionCodecName.SNAPPY;
 

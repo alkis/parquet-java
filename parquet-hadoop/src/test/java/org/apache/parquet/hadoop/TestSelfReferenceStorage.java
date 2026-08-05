@@ -131,7 +131,9 @@ public class TestSelfReferenceStorage {
       assertThat(range.getSize()).isEqualTo((long) stored.length);
       BytesInput resolvedBack =
           SelfReferenceStorage.resolve(BytesInput.from(stored), codec, codecFactory, null, null, 0, 0, 0L);
-      assertThat(resolvedBack.toByteArray()).as("payload of %s bytes", size).isEqualTo(resolved);
+      assertThat(resolvedBack.toByteArray())
+          .as("payload of %s bytes", size)
+          .isEqualTo(resolved);
     }
     codecFactory.release();
   }
@@ -179,8 +181,7 @@ public class TestSelfReferenceStorage {
     assertThat(range.getSize()).isEqualTo((long) fileBytes.length);
     // The stored module carries the 4-byte length prefix and 12-byte nonce (and a 16-byte GCM tag
     // for GCM), so it is larger than the raw compressed payload.
-    int expectedOverhead =
-        AesCipher.NONCE_LENGTH + 4 + (mode == AesMode.GCM ? AesCipher.GCM_TAG_LENGTH : 0);
+    int expectedOverhead = AesCipher.NONCE_LENGTH + 4 + (mode == AesMode.GCM ? AesCipher.GCM_TAG_LENGTH : 0);
     assertThat(range.getSize()).isGreaterThan((long) expectedOverhead);
 
     BlockCipher.Decryptor decryptor = ModuleCipherFactory.getDecryptor(mode, COLUMN_KEY);
@@ -244,11 +245,17 @@ public class TestSelfReferenceStorage {
     // The first block's bytes cannot be resolved at the second block's offset.
     BlockCipher.Decryptor decryptor = ModuleCipherFactory.getDecryptor(AesMode.GCM, COLUMN_KEY);
     assertThatThrownBy(() -> SelfReferenceStorage.resolve(
-            BytesInput.from(firstStored), codec, codecFactory, decryptor, FILE_AAD, 1, 2, second.getOffset()))
+            BytesInput.from(firstStored),
+            codec,
+            codecFactory,
+            decryptor,
+            FILE_AAD,
+            1,
+            2,
+            second.getOffset()))
         .isInstanceOf(ParquetCryptoRuntimeException.class);
     codecFactory.release();
   }
-
 
   @Test
   public void testEmptyPayloadRoundTrip() throws IOException {

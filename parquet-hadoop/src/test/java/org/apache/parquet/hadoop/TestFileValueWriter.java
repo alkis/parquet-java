@@ -67,8 +67,7 @@ public class TestFileValueWriter {
       + "  }"
       + "}");
 
-  private static final ColumnDescriptor INLINE_COLUMN =
-      SCHEMA.getColumnDescription(new String[] {"file", "inline"});
+  private static final ColumnDescriptor INLINE_COLUMN = SCHEMA.getColumnDescription(new String[] {"file", "inline"});
 
   private static final CompressionCodecName CODEC = CompressionCodecName.SNAPPY;
 
@@ -126,7 +125,9 @@ public class TestFileValueWriter {
     writer.writeDataPage(
         1,
         (int) inlined.getInlineBytes().length(),
-        codecFactory.getCompressor(CODEC).compress(BytesInput.from(inlined.getInlineBytes().toByteBuffer())),
+        codecFactory
+            .getCompressor(CODEC)
+            .compress(BytesInput.from(inlined.getInlineBytes().toByteBuffer())),
         EMPTY_STATS,
         Encoding.BIT_PACKED,
         Encoding.BIT_PACKED,
@@ -141,8 +142,7 @@ public class TestFileValueWriter {
         ParquetFileReader.open(inputFile, ParquetReadOptions.builder().build())) {
       BlockMetaData block = reader.getFooter().getBlocks().get(0);
       ColumnChunkMetaData inlineMeta = findColumn(block, INLINE_COLUMN);
-      BytesInput resolved =
-          reader.resolveSelfReference(inlineMeta, outOfLine.getOffset(), outOfLine.getSize());
+      BytesInput resolved = reader.resolveSelfReference(inlineMeta, outOfLine.getOffset(), outOfLine.getSize());
       assertThat(resolved.toByteArray()).isEqualTo(aboveThreshold.getBytes());
     }
     codecFactory.release();
@@ -161,8 +161,8 @@ public class TestFileValueWriter {
     writer.start();
     writer.startBlock(payloads.length);
 
-    FileValueWriter valueWriter = new FileValueWriter(
-        writer, codecFactory.getCompressor(CODEC), null, columnOrdinalOf(INLINE_COLUMN), 0);
+    FileValueWriter valueWriter =
+        new FileValueWriter(writer, codecFactory.getCompressor(CODEC), null, columnOrdinalOf(INLINE_COLUMN), 0);
 
     List<FileValueWriter.Placement> placements = new ArrayList<>();
     for (byte[] p : payloads) {
@@ -212,11 +212,7 @@ public class TestFileValueWriter {
     writer.startBlock(1);
 
     FileValueWriter valueWriter = new FileValueWriter(
-        writer,
-        codecFactory.getCompressor(CODEC),
-        null,
-        columnOrdinalOf(INLINE_COLUMN),
-        Integer.MAX_VALUE);
+        writer, codecFactory.getCompressor(CODEC), null, columnOrdinalOf(INLINE_COLUMN), Integer.MAX_VALUE);
 
     long posBefore = writer.getPos();
     FileValueWriter.Placement placement = valueWriter.write(Binary.fromConstantByteArray(payload(1 << 20)));

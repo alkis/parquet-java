@@ -152,8 +152,7 @@ public final class SelfReferenceStorage {
             + "-byte limit imposed by the 4-byte length field of an encrypted module. "
             + "Store this value as an external reference (uri) instead.");
       }
-      byte[] selfReferenceAAD =
-          AesCipher.createSelfReferenceAAD(fileAAD, rowGroupOrdinal, columnOrdinal, offset);
+      byte[] selfReferenceAAD = AesCipher.createSelfReferenceAAD(fileAAD, rowGroupOrdinal, columnOrdinal, offset);
       stored = BytesInput.from(pageBlockEncryptor.encrypt(stored.toByteArray(), selfReferenceAAD));
     }
 

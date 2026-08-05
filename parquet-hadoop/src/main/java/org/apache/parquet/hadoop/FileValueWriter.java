@@ -138,7 +138,12 @@ public class FileValueWriter {
    *     compression a self-reference inherits
    * @param inlineColumnEncryptor the data-module encryptor of the {@code inline} column chunk, or
    *     {@code null} if that column chunk is not encrypted
-   * @param inlineColumnOrdinal the ordinal of the {@code inline} column within the schema
+   * @param inlineColumnOrdinal the ordinal of the {@code inline} column within the schema. The
+   *     schema must declare {@code inline}: it is the reference point whose compression and
+   *     encryption a self-reference inherits, so a schema without it can only store payloads inline
+   *     or as external references. Note that the schema builder does not require {@code inline} for
+   *     groups that declare {@code uri}, so an external-reference schema may reach here; pair such a
+   *     schema with a threshold of {@link Integer#MAX_VALUE} so nothing is stored out of line.
    * @param selfReferenceThreshold payloads of at most this many bytes are stored inline; larger ones
    *     become self-references. See
    *     {@code ParquetProperties.Builder#withFileSelfReferenceThreshold(int)}.
